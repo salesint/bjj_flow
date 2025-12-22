@@ -8,10 +8,25 @@ interface Props {
 }
 
 const SessionCard: React.FC<Props> = ({ session, onDelete }) => {
-  const getIntensityColor = (level: number) => {
-    if (level <= 2) return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50';
-    if (level <= 4) return 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border-orange-200 dark:border-orange-800/50';
-    return 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 border-rose-200 dark:border-rose-800/50';
+  const getIntensityColors = (level: number) => {
+    if (level <= 2) return {
+      text: 'text-emerald-600 dark:text-emerald-400',
+      bg: 'bg-emerald-100 dark:bg-emerald-900/30',
+      bar: 'bg-emerald-500',
+      border: 'border-emerald-200 dark:border-emerald-800/50'
+    };
+    if (level <= 4) return {
+      text: 'text-orange-600 dark:text-orange-400',
+      bg: 'bg-orange-100 dark:bg-orange-900/30',
+      bar: 'bg-orange-500',
+      border: 'border-orange-200 dark:border-orange-800/50'
+    };
+    return {
+      text: 'text-rose-600 dark:text-rose-400',
+      bg: 'bg-rose-100 dark:bg-rose-900/30',
+      bar: 'bg-rose-500',
+      border: 'border-rose-200 dark:border-rose-800/50'
+    };
   };
 
   const getTypeBadgeColor = (type: SessionType) => {
@@ -25,6 +40,7 @@ const SessionCard: React.FC<Props> = ({ session, onDelete }) => {
     }
   };
 
+  const colors = getIntensityColors(session.intensity);
   const formattedDate = new Date(session.date);
 
   return (
@@ -49,10 +65,23 @@ const SessionCard: React.FC<Props> = ({ session, onDelete }) => {
               <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm ${getTypeBadgeColor(session.type)}`}>
                 {session.type}
               </span>
-              <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black border ${getIntensityColor(session.intensity)}`}>
-                <Activity size={12} strokeWidth={3} />
-                ESFORÇO {session.intensity}/5
+              
+              {/* Intensity Visual Meter */}
+              <div className={`flex items-center gap-2 px-3 py-1 rounded-full border ${colors.bg} ${colors.border}`}>
+                <Activity size={12} className={colors.text} strokeWidth={3} />
+                <div className="flex gap-0.5">
+                  {[1, 2, 3, 4, 5].map((step) => (
+                    <div 
+                      key={step} 
+                      className={`h-1.5 w-3 rounded-full transition-colors ${step <= session.intensity ? colors.bar : 'bg-slate-200 dark:bg-slate-700'}`}
+                    />
+                  ))}
+                </div>
+                <span className={`text-[9px] font-black uppercase tracking-tighter ${colors.text}`}>
+                  NÍVEL {session.intensity}
+                </span>
               </div>
+
               <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-[10px] font-black border border-blue-100 dark:border-blue-800/50">
                 <Clock size={12} strokeWidth={3} />
                 {session.duration} MINUTOS
