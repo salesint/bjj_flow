@@ -1,4 +1,3 @@
-
 export enum SessionType {
   GI = 'Gi',
   NO_GI = 'No-Gi',
@@ -22,11 +21,10 @@ export interface TrainingSession {
   type: SessionType;
   duration: number; // minutes
   intensity: number; // 1-5
-  positions: string[]; // Ex: Guarda, Passagem, Costas
-  drills: string[];    // Ex: 50 repetições de armlock
+  positions: string[]; 
+  drills: string[];    
   notes: string;
   partners: string[];
-  coach?: string;
 }
 
 export interface UserProfile {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { TrainingSession, SessionType } from '../types';
+import { TrainingSession, SessionType } from '../types.ts';
 
 interface Props {
   sessions: TrainingSession[];
@@ -18,50 +18,53 @@ const StatsBoard: React.FC<Props> = ({ sessions }) => {
   const totalPositions = sessions.reduce((acc, s) => acc + (s.positions?.length || 0), 0);
   const totalDrills = sessions.reduce((acc, s) => acc + (s.drills?.length || 0), 0);
   
-  const COLORS = ['#2563eb', '#64748b', '#10b981', '#a855f7', '#ef4444'];
+  const COLORS = ['#2563eb', '#64748b', '#10b981', '#6366f1', '#f43f5e'];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800">
-        <h4 className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-4">Volume Total</h4>
-        <div className="space-y-4">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+      <div className="bg-white dark:bg-slate-900 p-8 rounded-[2rem] shadow-sm border border-slate-200 dark:border-slate-800">
+        <h4 className="text-slate-400 dark:text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-6">Volume Consolidado</h4>
+        <div className="space-y-6">
           <div className="flex items-baseline gap-2">
-            <span className="text-5xl font-black text-slate-800 dark:text-white leading-none">{sessions.length}</span>
-            <span className="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase">Treinos</span>
+            <span className="text-6xl font-black text-slate-900 dark:text-white tracking-tighter leading-none">{sessions.length}</span>
+            <span className="text-slate-400 dark:text-slate-500 text-xs font-black uppercase tracking-widest">Sessões</span>
           </div>
           
-          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+          <div className="grid grid-cols-2 gap-4 pt-6 border-t border-slate-100 dark:border-slate-800">
             <div>
-              <div className="text-xl font-bold text-blue-600 dark:text-blue-400 leading-none">{totalPositions}</div>
-              <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase mt-1">Posições</div>
+              <div className="text-2xl font-black text-blue-600 dark:text-blue-400 leading-none">{totalPositions}</div>
+              <div className="text-[10px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-2">Técnicas</div>
             </div>
             <div>
-              <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400 leading-none">{totalDrills}</div>
-              <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase mt-1">Drills</div>
+              <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 leading-none">{totalDrills}</div>
+              <div className="text-[10px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-2">Drills</div>
             </div>
           </div>
 
-          <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-             <div className="text-sm font-bold text-slate-700 dark:text-slate-300">
-               <span className="text-blue-600 dark:text-blue-400">{Math.round(totalMinutes / 60)}h</span> <span className="text-slate-400 dark:text-slate-500 font-normal italic">no tatame</span>
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+             <div className="text-sm font-black text-slate-800 dark:text-slate-200 flex items-center gap-2">
+               <span className="text-blue-600 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded-lg">
+                 {Math.round(totalMinutes / 60)} HORAS
+               </span> 
+               <span className="text-slate-400 dark:text-slate-500 uppercase text-[10px] tracking-widest">acumuladas</span>
              </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 md:col-span-2">
-        <h4 className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-4">Modalidades</h4>
-        <div className="h-[200px] w-full">
+      <div className="bg-white dark:bg-slate-900 p-8 rounded-[2rem] shadow-sm border border-slate-200 dark:border-slate-800 md:col-span-2">
+        <h4 className="text-slate-400 dark:text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-6">Frequência por Modalidade</h4>
+        <div className="h-[240px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={typeData} layout="vertical" margin={{ left: 0, right: 30 }}>
-              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" className="dark:opacity-5" />
+            <BarChart data={typeData} layout="vertical" margin={{ left: 10, right: 30, top: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="currentColor" className="text-slate-100 dark:text-slate-800" />
               <XAxis type="number" hide />
               <YAxis 
                 dataKey="name" 
                 type="category" 
-                width={80} 
-                style={{ fontSize: '11px', fontWeight: 'bold' }}
-                tick={{ fill: 'currentColor', opacity: 0.6 }}
+                width={90} 
+                style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                tick={{ fill: 'currentColor', opacity: 0.7 }}
                 axisLine={false}
                 tickLine={false}
               />
@@ -70,13 +73,13 @@ const StatsBoard: React.FC<Props> = ({ sessions }) => {
                 contentStyle={{ 
                   borderRadius: '16px', 
                   border: 'none', 
-                  boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)',
-                  backgroundColor: '#0f172a',
+                  boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.5)',
+                  backgroundColor: '#020617',
                   color: 'white'
                 }}
-                itemStyle={{ color: '#fff', fontSize: '12px' }}
+                itemStyle={{ color: '#fff', fontSize: '11px', fontWeight: 'bold' }}
               />
-              <Bar dataKey="count" radius={[0, 8, 8, 0]} barSize={28}>
+              <Bar dataKey="count" radius={[0, 12, 12, 0]} barSize={32}>
                 {typeData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}

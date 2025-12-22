@@ -1,6 +1,6 @@
 import React from 'react';
 import { Calendar, Clock, Activity, Target, Move, FileText, Trash2, Tag } from 'lucide-react';
-import { TrainingSession, SessionType } from '../types';
+import { TrainingSession, SessionType } from '../types.ts';
 
 interface Props {
   session: TrainingSession;
@@ -9,9 +9,9 @@ interface Props {
 
 const SessionCard: React.FC<Props> = ({ session, onDelete }) => {
   const getIntensityColor = (level: number) => {
-    if (level <= 2) return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800/50';
-    if (level <= 4) return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800/50';
-    return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800/50';
+    if (level <= 2) return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50';
+    if (level <= 4) return 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border-orange-200 dark:border-orange-800/50';
+    return 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 border-rose-200 dark:border-rose-800/50';
   };
 
   const getTypeBadgeColor = (type: SessionType) => {
@@ -19,8 +19,8 @@ const SessionCard: React.FC<Props> = ({ session, onDelete }) => {
       case SessionType.GI: return 'bg-blue-600 text-white';
       case SessionType.NO_GI: return 'bg-slate-800 text-white dark:bg-slate-700';
       case SessionType.DRILL: return 'bg-emerald-500 text-white';
-      case SessionType.OPEN_MAT: return 'bg-purple-500 text-white';
-      case SessionType.COMPETITION: return 'bg-red-600 text-white';
+      case SessionType.OPEN_MAT: return 'bg-indigo-500 text-white';
+      case SessionType.COMPETITION: return 'bg-rose-600 text-white';
       default: return 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300';
     }
   };
@@ -28,107 +28,108 @@ const SessionCard: React.FC<Props> = ({ session, onDelete }) => {
   const formattedDate = new Date(session.date);
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-blue-400 dark:hover:border-blue-700 transition-all flex flex-col md:flex-row group">
-      {/* Sidebar de Data - Visível no Desktop */}
-      <div className="hidden md:flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-800/40 border-r border-slate-100 dark:border-slate-800 px-6 py-4 w-28 shrink-0">
-        <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-          {formattedDate.toLocaleDateString('pt-BR', { month: 'short' })}
+    <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-blue-500/50 dark:hover:border-blue-500/50 transition-all flex flex-col md:flex-row group">
+      {/* Sidebar Date Display */}
+      <div className="hidden md:flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-800/60 border-r border-slate-100 dark:border-slate-800 px-6 py-4 w-32 shrink-0">
+        <span className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+          {formattedDate.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '')}
         </span>
-        <span className="text-4xl font-black text-slate-800 dark:text-white leading-none py-1">
+        <span className="text-4xl font-black text-slate-900 dark:text-white leading-none my-1">
           {formattedDate.getUTCDate()}
         </span>
-        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">
-          {formattedDate.toLocaleDateString('pt-BR', { weekday: 'short' })}
+        <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase">
+          {formattedDate.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '')}
         </span>
       </div>
 
-      <div className="flex-1 p-6">
-        <div className="flex justify-between items-start mb-4">
-          <div className="flex flex-col gap-2">
+      <div className="flex-1 p-6 md:p-8">
+        <div className="flex justify-between items-start mb-5">
+          <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${getTypeBadgeColor(session.type)}`}>
+              <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm ${getTypeBadgeColor(session.type)}`}>
                 {session.type}
               </span>
-              <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black ${getIntensityColor(session.intensity)}`}>
-                <Activity size={10} />
-                ESFORÇO {session.intensity}
+              <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black border ${getIntensityColor(session.intensity)}`}>
+                <Activity size={12} strokeWidth={3} />
+                ESFORÇO {session.intensity}/5
               </div>
-              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-[9px] font-black border border-blue-100 dark:border-blue-800/50">
-                <Clock size={10} />
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-[10px] font-black border border-blue-100 dark:border-blue-800/50">
+                <Clock size={12} strokeWidth={3} />
                 {session.duration} MINUTOS
               </div>
             </div>
             
-            {session.title ? (
-              <h3 className="text-xl font-black text-slate-800 dark:text-slate-100 tracking-tight flex items-center gap-2">
-                <Tag size={18} className="text-blue-500" />
-                {session.title}
-              </h3>
-            ) : (
-              <h3 className="text-xl font-black text-slate-800 dark:text-slate-100 tracking-tight">
-                Sessão de {session.type}
-              </h3>
-            )}
+            <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+              {session.title ? (
+                <>
+                  <Tag size={20} className="text-blue-500 shrink-0" />
+                  {session.title}
+                </>
+              ) : (
+                `Treino de ${session.type}`
+              )}
+            </h3>
             
             <div className="md:hidden flex items-center gap-2 text-xs font-bold text-slate-400 dark:text-slate-500">
-              <Calendar size={12} />
+              <Calendar size={14} />
               {formattedDate.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })}
             </div>
           </div>
 
           <button 
             onClick={() => onDelete(session.id)}
-            className="text-slate-300 dark:text-slate-600 hover:text-red-500 transition-colors p-2 opacity-0 group-hover:opacity-100"
+            className="text-slate-300 dark:text-slate-700 hover:text-rose-500 transition-colors p-2"
+            title="Excluir treino"
           >
-            <Trash2 size={18} />
+            <Trash2 size={20} />
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-[10px] uppercase tracking-wider">
-              <Move size={12} />
-              Posições & Cenários
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-black text-[10px] uppercase tracking-widest">
+              <Move size={14} strokeWidth={3} />
+              Posições e Técnicas
             </div>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {session.positions && session.positions.length > 0 ? (
                 session.positions.map((pos, i) => (
-                  <span key={i} className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-2.5 py-1 rounded-lg text-xs font-bold border border-slate-200 dark:border-slate-700">
+                  <span key={i} className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-200 dark:border-slate-700 shadow-sm">
                     {pos}
                   </span>
                 ))
               ) : (
-                <span className="text-slate-300 dark:text-slate-700 text-[10px] italic">Não informado</span>
+                <span className="text-slate-300 dark:text-slate-700 text-xs italic">Nenhuma posição registrada</span>
               )}
             </div>
           </div>
 
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-[10px] uppercase tracking-wider">
-              <Target size={12} />
-              Drills & Repetições
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-black text-[10px] uppercase tracking-widest">
+              <Target size={14} strokeWidth={3} />
+              Drills Realizados
             </div>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {session.drills && session.drills.length > 0 ? (
                 session.drills.map((drill, i) => (
-                  <span key={i} className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-2.5 py-1 rounded-lg text-xs font-bold border border-slate-200 dark:border-slate-700">
+                  <span key={i} className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-200 dark:border-slate-700 shadow-sm">
                     {drill}
                   </span>
                 ))
               ) : (
-                <span className="text-slate-300 dark:text-slate-700 text-[10px] italic">Não informado</span>
+                <span className="text-slate-300 dark:text-slate-700 text-xs italic">Nenhum drill registrado</span>
               )}
             </div>
           </div>
         </div>
 
         {session.notes && (
-          <div className="mt-6 p-4 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border border-slate-100 dark:border-slate-800">
-            <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500 font-bold mb-2 text-[10px] uppercase tracking-wider">
-              <FileText size={12} />
-              Notas de Treino
+          <div className="mt-8 p-5 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-100 dark:border-slate-800/60">
+            <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500 font-black mb-3 text-[10px] uppercase tracking-widest">
+              <FileText size={14} strokeWidth={3} />
+              Observações & Insights
             </div>
-            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
               {session.notes}
             </p>
           </div>
