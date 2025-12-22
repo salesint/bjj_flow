@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Plus, LayoutDashboard, Calendar as CalendarIcon, Trophy, Search, User, Sun, Moon, Clock } from 'lucide-react';
+import { Plus, LayoutDashboard, Calendar as CalendarIcon, Trophy, Search, User, Sun, Moon, Clock, Filter, X } from 'lucide-react';
 import { TrainingSession } from './types.ts';
 import SessionCard from './components/SessionCard.tsx';
 import SessionForm from './components/SessionForm.tsx';
@@ -14,6 +14,10 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'timeline' | 'dashboard'>('timeline');
   const [searchQuery, setSearchQuery] = useState('');
   
+  // Filter states
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
   // Initialize theme from localStorage or system preference
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const savedTheme = localStorage.getItem(THEME_KEY);
@@ -65,15 +69,29 @@ const App: React.FC = () => {
     }
   };
 
+  const clearFilters = () => {
+    setSearchQuery('');
+    setStartDate('');
+    setEndDate('');
+  };
+
   const filteredSessions = useMemo(() => {
-    return sessions.filter(s => 
-      (s.title?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
-      s.positions.some(p => p.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      s.drills.some(d => d.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      s.notes.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.type.toLowerCase().includes(searchQuery.toLowerCase())
-    ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }, [sessions, searchQuery]);
+    return sessions.filter(s => {
+      const matchesSearch = (s.title?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+        s.positions.some(p => p.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        s.drills.some(d => d.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        s.notes.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        s.type.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const sessionDate = new Date(s.date).getTime();
+      const start = startDate ? new Date(startDate).getTime() : -Infinity;
+      const end = endDate ? new Date(endDate).getTime() : Infinity;
+      
+      const matchesDate = sessionDate >= start && sessionDate <= end;
+
+      return matchesSearch && matchesDate;
+    }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [sessions, searchQuery, startDate, endDate]);
 
   const totalTimeLabel = useMemo(() => {
     const mins = sessions.reduce((acc, s) => acc + (Number(s.duration) || 0), 0);
@@ -143,10 +161,50 @@ const App: React.FC = () => {
                 <input 
                   type="text"
                   placeholder="Buscar técnicas, posições..."
-                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl py-3.5 pl-11 pr-4 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none w-full md:w-80 shadow-sm transition-all dark:text-white"
+                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl py-3.5 pl-11 pr-4 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none w-full md:w-80 shadow-sm transition-all dark:text-white font-bold"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
+              </div>
+            </div>
+
+            {/* Date Filters Row */}
+            <div className="bg-white dark:bg-slate-900 p-4 md:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-center gap-6">
+              <div className="flex items-center gap-3 shrink-0">
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-2 rounded-xl border border-blue-100 dark:border-blue-800/50">
+                  <Filter size={18} className="text-blue-600 dark:text-blue-400" />
+                </div>
+                <span className="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Filtrar Período</span>
+              </div>
+
+              <div className="flex flex-1 items-center gap-3 w-full">
+                <div className="relative flex-1">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400 uppercase tracking-tighter">De</span>
+                  <input 
+                    type="date" 
+                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-xl py-2 pl-10 pr-4 text-xs font-bold dark:text-white transition-all focus:ring-2 focus:ring-blue-500 outline-none"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                  />
+                </div>
+                <div className="relative flex-1">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400 uppercase tracking-tighter">Até</span>
+                  <input 
+                    type="date" 
+                    className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-xl py-2 pl-10 pr-4 text-xs font-bold dark:text-white transition-all focus:ring-2 focus:ring-blue-500 outline-none"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                  />
+                </div>
+                {(startDate || endDate || searchQuery) && (
+                  <button 
+                    onClick={clearFilters}
+                    className="p-2 text-slate-400 hover:text-rose-500 transition-colors"
+                    title="Limpar filtros"
+                  >
+                    <X size={20} />
+                  </button>
+                )}
               </div>
             </div>
 
@@ -162,9 +220,9 @@ const App: React.FC = () => {
               ) : (
                 <div className="py-24 text-center bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-300 dark:border-slate-800">
                   <CalendarIcon className="text-slate-200 dark:text-slate-800 mx-auto mb-4" size={64} />
-                  <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200">Nenhum treino registrado</h3>
+                  <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200">Nenhum treino encontrado</h3>
                   <p className="text-slate-500 dark:text-slate-500 text-sm mt-2 max-w-xs mx-auto">
-                    {searchQuery ? 'Não encontramos nada com esse termo.' : 'Sua jornada de evolução técnica começa aqui.'}
+                    {searchQuery || startDate || endDate ? 'Tente ajustar seus filtros para encontrar o que procura.' : 'Sua jornada de evolução técnica começa aqui.'}
                   </p>
                 </div>
               )}
