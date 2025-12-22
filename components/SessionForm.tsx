@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { X, Plus, Save, Move, Target, FileText, Calendar, Clock, Tag, ChevronDown } from 'lucide-react';
 import { TrainingSession, SessionType } from '../types';
@@ -39,13 +38,6 @@ const SessionForm: React.FC<Props> = ({ onSave, onCancel }) => {
     }
   };
 
-  const handleAddPartner = () => {
-    if (partnersInput.trim()) {
-      setPartners([...partners, partnersInput.trim()]);
-      setPartnersInput('');
-    }
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave({
@@ -61,59 +53,58 @@ const SessionForm: React.FC<Props> = ({ onSave, onCancel }) => {
     });
   };
 
+  const inputClass = "w-full border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-slate-50 dark:bg-slate-800 dark:text-white font-medium placeholder:text-slate-400 dark:placeholder:text-slate-600 transition-colors";
+
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[95vh] animate-in fade-in zoom-in duration-300">
-        <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+    <div className="fixed inset-0 bg-slate-900/70 dark:bg-slate-950/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in duration-200 border border-transparent dark:border-slate-800">
+        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/20">
           <div>
-            <h2 className="text-xl font-black text-slate-800 tracking-tight">Registro de Evolução</h2>
-            <p className="text-xs text-slate-500 font-medium">Preencha os detalhes para um estudo posterior eficiente</p>
+            <h2 className="text-xl font-black text-slate-800 dark:text-white tracking-tight">Registro de Sessão</h2>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5">Mantenha seu fluxo de evolução</p>
           </div>
-          <button onClick={onCancel} className="text-slate-400 hover:text-slate-600 bg-white p-2 rounded-full shadow-sm">
+          <button onClick={onCancel} className="text-slate-400 hover:text-slate-600 dark:hover:text-white p-2">
             <X size={20} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 overflow-y-auto space-y-6">
-          {/* Title Field - Optional but didactic */}
+        <form onSubmit={handleSubmit} className="p-6 md:p-8 overflow-y-auto space-y-6">
           <div className="space-y-2">
-            <label className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
-              <Tag size={14} className="text-blue-500" /> Título da Sessão (Opcional)
+            <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+              <Tag size={12} className="text-blue-500" /> Título (Ex: Passagem de Meia)
             </label>
             <input 
               type="text" 
               value={title} 
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Ex: 'Foco na Passagem de Guarda' ou 'Sparring com João'"
-              className="w-full border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-slate-50 font-medium placeholder:text-slate-400"
+              placeholder="Opcional..."
+              className={inputClass}
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Date Picker */}
             <div className="space-y-2">
-              <label className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                <Calendar size={14} className="text-blue-500" /> Data do Treino
+              <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                <Calendar size={12} /> Data
               </label>
               <input 
                 type="date" 
                 value={date} 
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-slate-50"
+                className={inputClass}
                 required
               />
             </div>
 
-            {/* Session Type Select */}
             <div className="space-y-2">
-              <label className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                <Target size={14} className="text-slate-500" /> Categoria/Modalidade
+              <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                <Target size={12} /> Categoria
               </label>
               <div className="relative">
                 <select 
                   value={type} 
                   onChange={(e) => setType(e.target.value as SessionType)}
-                  className="w-full border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-slate-50 appearance-none cursor-pointer"
+                  className={`${inputClass} appearance-none cursor-pointer pr-10`}
                 >
                   {Object.values(SessionType).map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
@@ -121,129 +112,124 @@ const SessionForm: React.FC<Props> = ({ onSave, onCancel }) => {
               </div>
             </div>
 
-            {/* Duration */}
             <div className="space-y-2">
-              <label className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                <Clock size={14} className="text-slate-500" /> Duração (minutos)
+              <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                <Clock size={12} /> Duração (min)
               </label>
               <input 
                 type="number" 
                 value={duration} 
                 onChange={(e) => setDuration(Number(e.target.value))}
-                className="w-full border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-slate-50"
-                min="0"
-                placeholder="Ex: 60, 90..."
+                className={inputClass}
+                min="1"
               />
             </div>
           </div>
 
-          {/* Positions Section */}
-          <div className="space-y-3 pt-2">
-            <label className="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase tracking-wider">
-              <Move size={16} /> Posições Trabalhadas (Foco Estrutural)
-            </label>
-            <div className="flex gap-2">
-              <input 
-                type="text" 
-                value={posInput}
-                onChange={(e) => setPosInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddPos())}
-                placeholder="Ex: Guarda De La Riva, Meia-guarda Profunda..."
-                className="flex-1 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-              <button type="button" onClick={handleAddPos} className="bg-blue-600 text-white px-4 rounded-xl hover:bg-blue-700 transition-colors">
-                <Plus size={20} />
-              </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <label className="flex items-center gap-2 text-[10px] font-black text-blue-500 dark:text-blue-400 uppercase tracking-widest">
+                <Move size={14} /> Posições
+              </label>
+              <div className="flex gap-2">
+                <input 
+                  type="text" 
+                  value={posInput}
+                  onChange={(e) => setPosInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddPos())}
+                  placeholder="Guarda, Passagem..."
+                  className={inputClass}
+                />
+                <button type="button" onClick={handleAddPos} className="bg-blue-600 text-white px-3 rounded-xl hover:bg-blue-500 transition-colors">
+                  <Plus size={18} />
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {positions.map((p, i) => (
+                  <span key={i} className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-2 border border-blue-100 dark:border-blue-800">
+                    {p}
+                    <button type="button" onClick={() => setPositions(positions.filter((_, idx) => idx !== i))} className="opacity-60 hover:opacity-100">
+                      <X size={10} />
+                    </button>
+                  </span>
+                ))}
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {positions.map((p, i) => (
-                <span key={i} className="bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 border border-blue-100">
-                  {p}
-                  <button type="button" onClick={() => setPositions(positions.filter((_, idx) => idx !== i))} className="hover:text-blue-900">
-                    <X size={12} />
-                  </button>
-                </span>
-              ))}
+
+            <div className="space-y-3">
+              <label className="flex items-center gap-2 text-[10px] font-black text-emerald-500 dark:text-emerald-400 uppercase tracking-widest">
+                <Target size={14} /> Drills
+              </label>
+              <div className="flex gap-2">
+                <input 
+                  type="text" 
+                  value={drillInput}
+                  onChange={(e) => setDrillInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddDrill())}
+                  placeholder="Técnica X..."
+                  className={inputClass}
+                />
+                <button type="button" onClick={handleAddDrill} className="bg-emerald-600 text-white px-3 rounded-xl hover:bg-emerald-500 transition-colors">
+                  <Plus size={18} />
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {drills.map((d, i) => (
+                  <span key={i} className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-2 border border-emerald-100 dark:border-emerald-800">
+                    {d}
+                    <button type="button" onClick={() => setDrills(drills.filter((_, idx) => idx !== i))} className="opacity-60 hover:opacity-100">
+                      <X size={10} />
+                    </button>
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Drills Section */}
-          <div className="space-y-3">
-            <label className="flex items-center gap-2 text-xs font-bold text-emerald-600 uppercase tracking-wider">
-              <Target size={16} /> Drills Realizados (Repetição Técnica)
-            </label>
-            <div className="flex gap-2">
-              <input 
-                type="text" 
-                value={drillInput}
-                onChange={(e) => setDrillInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddDrill())}
-                placeholder="Ex: 20x Raspagem Tesourinha, Drill de Rolamento..."
-                className="flex-1 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-              />
-              <button type="button" onClick={handleAddDrill} className="bg-emerald-600 text-white px-4 rounded-xl hover:bg-emerald-700 transition-colors">
-                <Plus size={20} />
-              </button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {drills.map((d, i) => (
-                <span key={i} className="bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 border border-emerald-100">
-                  {d}
-                  <button type="button" onClick={() => setDrills(drills.filter((_, idx) => idx !== i))} className="hover:text-emerald-900">
-                    <X size={12} />
-                  </button>
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Observations */}
-          <div className="space-y-3">
-            <label className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
-              <FileText size={16} /> Observações & Insights Pessoais
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+              <FileText size={14} /> Observações
             </label>
             <textarea 
               value={notes} 
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Descreva o que aprendeu, erros cometidos ou sensações do treino..."
-              className="w-full border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none h-24 resize-none bg-slate-50 placeholder:italic"
+              placeholder="O que funcionou hoje? O que precisa melhorar?"
+              className={`${inputClass} h-24 resize-none`}
             />
           </div>
 
-          {/* Intensity Slider */}
-          <div className="space-y-4 pt-2">
-            <label className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
-              Intensidade (Nível de Esforço)
+          <div className="space-y-4">
+            <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+              Nível de Esforço ({intensity})
             </label>
             <input 
               type="range" 
               min="1" max="5" 
               value={intensity} 
               onChange={(e) => setIntensity(Number(e.target.value))}
-              className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-600 dark:accent-blue-500"
             />
-            <div className="flex justify-between text-[10px] font-black uppercase text-slate-400 px-1">
-              <span>Recuperação (1)</span>
-              <span>Moderado (3)</span>
-              <span>Competição (5)</span>
+            <div className="flex justify-between text-[9px] font-black uppercase text-slate-300 dark:text-slate-600">
+              <span>Leve</span>
+              <span>Moderado</span>
+              <span>Máximo</span>
             </div>
           </div>
 
-          {/* Footer Buttons */}
-          <div className="flex gap-4 pt-6 sticky bottom-0 bg-white pb-2">
+          <div className="flex gap-4 pt-4 sticky bottom-0 bg-white dark:bg-slate-900 pb-2">
             <button 
               type="button" 
               onClick={onCancel}
-              className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-4 rounded-2xl transition-all"
+              className="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold py-3 rounded-xl text-sm"
             >
               Cancelar
             </button>
             <button 
               type="submit" 
-              className="flex-[2] bg-slate-900 hover:bg-blue-600 text-white font-bold py-4 px-8 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-900/10"
+              className="flex-[2] bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-sm shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2"
             >
-              <Save size={20} />
-              Salvar Registro
+              <Save size={18} />
+              Salvar Treino
             </button>
           </div>
         </form>
