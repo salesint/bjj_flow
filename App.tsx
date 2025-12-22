@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Plus, LayoutDashboard, Calendar as CalendarIcon, Trophy, Search, User, Sun, Moon } from 'lucide-react';
+import { Plus, LayoutDashboard, Calendar as CalendarIcon, Trophy, Search, User, Sun, Moon, Clock } from 'lucide-react';
 import { TrainingSession } from './types';
 import SessionCard from './components/SessionCard';
 import SessionForm from './components/SessionForm';
@@ -14,37 +14,43 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'timeline' | 'dashboard'>('timeline');
   const [searchQuery, setSearchQuery] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    const savedTheme = localStorage.getItem(THEME_KEY);
-    // Default to dark if not set
-    return savedTheme ? savedTheme === 'dark' : true;
+    try {
+      const savedTheme = localStorage.getItem(THEME_KEY);
+      return savedTheme ? savedTheme === 'dark' : true;
+    } catch (e) {
+      return true;
+    }
   });
 
-  // Load data on mount
+  // Carregar dados
   useEffect(() => {
-    const savedData = localStorage.getItem(STORAGE_KEY);
-    if (savedData) {
-      try {
+    try {
+      const savedData = localStorage.getItem(STORAGE_KEY);
+      if (savedData) {
         setSessions(JSON.parse(savedData));
-      } catch (e) {
-        console.error("Failed to load sessions", e);
       }
+    } catch (e) {
+      console.error("Erro ao carregar sessões", e);
     }
   }, []);
 
-  // Sync dark mode class
+  // Sincronizar tema
   useEffect(() => {
+    const root = window.document.documentElement;
     if (isDarkMode) {
-      document.documentElement.classList.add('dark');
+      root.classList.add('dark');
       localStorage.setItem(THEME_KEY, 'dark');
     } else {
-      document.documentElement.classList.remove('dark');
+      root.classList.remove('dark');
       localStorage.setItem(THEME_KEY, 'light');
     }
   }, [isDarkMode]);
 
-  // Save data on change
+  // Salvar dados
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
+    if (sessions.length > 0 || localStorage.getItem(STORAGE_KEY)) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
+    }
   }, [sessions]);
 
   const handleAddSession = (newSessionData: Omit<TrainingSession, 'id'>) => {
@@ -52,13 +58,13 @@ const App: React.FC = () => {
       ...newSessionData,
       id: crypto.randomUUID(),
     };
-    setSessions([newSession, ...sessions]);
+    setSessions(prev => [newSession, ...prev]);
     setIsFormOpen(false);
   };
 
   const handleDeleteSession = (id: string) => {
     if (window.confirm('Tem certeza que deseja excluir este treino?')) {
-      setSessions(sessions.filter(s => s.id !== id));
+      setSessions(prev => prev.filter(s => s.id !== id));
     }
   };
 
@@ -72,10 +78,15 @@ const App: React.FC = () => {
     ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [sessions, searchQuery]);
 
+  const totalHours = useMemo(() => {
+    const mins = sessions.reduce((acc, s) => acc + (Number(s.duration) || 0), 0);
+    return Math.floor(mins / 60);
+  }, [sessions]);
+
   return (
-    <div className="min-h-screen flex flex-col font-inter transition-colors duration-300 dark:bg-slate-950">
+    <div className="min-h-screen flex flex-col font-inter transition-colors duration-300 bg-slate-50 dark:bg-slate-950">
       {/* Header */}
-      <header className="bg-white/80 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 sticky top-0 z-40">
+      <header className="bg-white/80 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40">
         <div className="max-w-5xl mx-auto px-4 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="bg-slate-900 dark:bg-blue-600 p-2.5 rounded-2xl rotate-3 shadow-xl">
@@ -98,39 +109,42 @@ const App: React.FC = () => {
               onClick={() => setActiveTab('dashboard')}
               className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${activeTab === 'dashboard' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-400 dark:text-slate-500'}`}
             >
-              PERFORMANCE
+              ESTATÍSTICAS
             </button>
           </div>
 
           <div className="flex items-center gap-2">
             <button 
               onClick={() => setIsDarkMode(!isDarkMode)}
-              className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all"
+              className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all border border-transparent dark:border-slate-700"
               aria-label="Alternar modo escuro"
             >
               {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
             </button>
-            <div className="w-10 h-10 rounded-xl bg-slate-900 dark:bg-slate-700 flex items-center justify-center border border-slate-800 dark:border-slate-600">
+            <div className="w-10 h-10 rounded-xl bg-slate-900 dark:bg-blue-600 flex items-center justify-center shadow-lg">
               <User className="text-white" size={20} />
             </div>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-10 pb-24">
+      <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-8 pb-32">
         {activeTab === 'timeline' && (
           <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
               <div>
-                <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Evolução Diária</h2>
-                <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">Registro didático das suas sessões de treino.</p>
+                <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Evolução Técnica</h2>
+                <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-medium text-sm mt-1">
+                  <Clock size={14} className="text-blue-500" />
+                  <span>{totalHours} horas totais de tatame</span>
+                </div>
               </div>
 
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input 
                   type="text"
-                  placeholder="Pesquisar técnicas ou notas..."
+                  placeholder="Posições, drills ou notas..."
                   className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl py-3 pl-11 pr-4 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none w-full md:w-72 shadow-sm transition-all dark:text-white"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -150,8 +164,10 @@ const App: React.FC = () => {
               ) : (
                 <div className="py-24 text-center bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
                   <CalendarIcon className="text-slate-300 dark:text-slate-700 mx-auto mb-4" size={48} />
-                  <h3 className="text-xl font-bold text-slate-800 dark:text-white">Sem treinos registrados</h3>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Sua jornada começa com o primeiro registro.</p>
+                  <h3 className="text-xl font-bold text-slate-800 dark:text-white">Nenhum treino encontrado</h3>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
+                    {searchQuery ? 'Tente outros termos de busca.' : 'Sua jornada começa com o primeiro registro.'}
+                  </p>
                 </div>
               )}
             </div>
@@ -170,14 +186,16 @@ const App: React.FC = () => {
         )}
       </main>
 
-      {/* Floating Action Button */}
-      <button 
-        onClick={() => setIsFormOpen(true)}
-        className="fixed bottom-8 right-8 bg-blue-600 text-white px-6 py-4 rounded-2xl shadow-2xl shadow-blue-500/20 hover:bg-blue-500 hover:scale-105 transition-all z-40 flex items-center gap-3 font-black"
-      >
-        <Plus size={24} />
-        <span className="text-sm uppercase tracking-widest hidden sm:inline">Novo Treino</span>
-      </button>
+      {/* Botão flutuante fixo */}
+      <div className="fixed bottom-0 left-0 right-0 p-6 pointer-events-none flex justify-center sm:justify-end">
+        <button 
+          onClick={() => setIsFormOpen(true)}
+          className="pointer-events-auto bg-blue-600 text-white px-8 py-5 rounded-2xl shadow-2xl shadow-blue-500/40 hover:bg-blue-500 hover:scale-105 active:scale-95 transition-all z-40 flex items-center gap-3 font-black text-sm uppercase tracking-widest"
+        >
+          <Plus size={24} />
+          Registrar Treino
+        </button>
+      </div>
 
       {/* Modal Form */}
       {isFormOpen && (

@@ -9,9 +9,9 @@ interface Props {
 
 const SessionCard: React.FC<Props> = ({ session, onDelete }) => {
   const getIntensityColor = (level: number) => {
-    if (level <= 2) return 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400 border border-green-200 dark:border-green-800';
-    if (level <= 4) return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800';
-    return 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400 border border-red-200 dark:border-red-800';
+    if (level <= 2) return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800/50';
+    if (level <= 4) return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800/50';
+    return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800/50';
   };
 
   const getTypeBadgeColor = (type: SessionType) => {
@@ -28,8 +28,8 @@ const SessionCard: React.FC<Props> = ({ session, onDelete }) => {
   const formattedDate = new Date(session.date);
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-blue-300 dark:hover:border-blue-700 transition-all flex flex-col md:flex-row">
-      {/* Date Sidebar - Desktop */}
+    <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-blue-400 dark:hover:border-blue-700 transition-all flex flex-col md:flex-row group">
+      {/* Sidebar de Data - Visível no Desktop */}
       <div className="hidden md:flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-800/40 border-r border-slate-100 dark:border-slate-800 px-6 py-4 w-28 shrink-0">
         <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
           {formattedDate.toLocaleDateString('pt-BR', { month: 'short' })}
@@ -53,19 +53,19 @@ const SessionCard: React.FC<Props> = ({ session, onDelete }) => {
                 <Activity size={10} />
                 ESFORÇO {session.intensity}
               </div>
-              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[9px] font-black border border-slate-200 dark:border-slate-700">
+              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-[9px] font-black border border-blue-100 dark:border-blue-800/50">
                 <Clock size={10} />
                 {session.duration} MINUTOS
               </div>
             </div>
             
             {session.title ? (
-              <h3 className="text-xl font-black text-slate-800 dark:text-white tracking-tight flex items-center gap-2">
+              <h3 className="text-xl font-black text-slate-800 dark:text-slate-100 tracking-tight flex items-center gap-2">
                 <Tag size={18} className="text-blue-500" />
                 {session.title}
               </h3>
             ) : (
-              <h3 className="text-xl font-black text-slate-800 dark:text-white tracking-tight">
+              <h3 className="text-xl font-black text-slate-800 dark:text-slate-100 tracking-tight">
                 Sessão de {session.type}
               </h3>
             )}
@@ -78,7 +78,7 @@ const SessionCard: React.FC<Props> = ({ session, onDelete }) => {
 
           <button 
             onClick={() => onDelete(session.id)}
-            className="text-slate-300 dark:text-slate-600 hover:text-red-500 transition-colors p-2"
+            className="text-slate-300 dark:text-slate-600 hover:text-red-500 transition-colors p-2 opacity-0 group-hover:opacity-100"
           >
             <Trash2 size={18} />
           </button>
@@ -91,9 +91,9 @@ const SessionCard: React.FC<Props> = ({ session, onDelete }) => {
               Posições & Cenários
             </div>
             <div className="flex flex-wrap gap-1.5">
-              {session.positions.length > 0 ? (
+              {session.positions && session.positions.length > 0 ? (
                 session.positions.map((pos, i) => (
-                  <span key={i} className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 px-2.5 py-1 rounded-lg text-xs font-bold border border-blue-100 dark:border-blue-800">
+                  <span key={i} className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-2.5 py-1 rounded-lg text-xs font-bold border border-slate-200 dark:border-slate-700">
                     {pos}
                   </span>
                 ))
@@ -109,9 +109,9 @@ const SessionCard: React.FC<Props> = ({ session, onDelete }) => {
               Drills & Repetições
             </div>
             <div className="flex flex-wrap gap-1.5">
-              {session.drills.length > 0 ? (
+              {session.drills && session.drills.length > 0 ? (
                 session.drills.map((drill, i) => (
-                  <span key={i} className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 px-2.5 py-1 rounded-lg text-xs font-bold border border-emerald-100 dark:border-emerald-800">
+                  <span key={i} className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-2.5 py-1 rounded-lg text-xs font-bold border border-slate-200 dark:border-slate-700">
                     {drill}
                   </span>
                 ))
@@ -128,8 +128,8 @@ const SessionCard: React.FC<Props> = ({ session, onDelete }) => {
               <FileText size={12} />
               Notas de Treino
             </div>
-            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed italic">
-              "{session.notes}"
+            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              {session.notes}
             </p>
           </div>
         )}
