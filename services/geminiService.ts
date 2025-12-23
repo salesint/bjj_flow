@@ -1,8 +1,9 @@
 
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { TrainingSession } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+// Always initialize with the named apiKey parameter from process.env.API_KEY
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const getTechnicalInsights = async (sessions: TrainingSession[]) => {
   if (sessions.length === 0) return "Adicione alguns treinos para receber insights do Sensei AI.";
@@ -13,6 +14,7 @@ export const getTechnicalInsights = async (sessions: TrainingSession[]) => {
     type: s.type,
     positions: s.positions.join(', '),
     drills: s.drills.join(', '),
+    partners: s.partners.join(', '),
     notes: s.notes
   }));
 
@@ -26,13 +28,15 @@ export const getTechnicalInsights = async (sessions: TrainingSession[]) => {
   Meus treinos recentes: ${JSON.stringify(recentSessions)}`;
 
   try {
+    // Using gemini-3-pro-preview for complex technical reasoning tasks.
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3-pro-preview',
       contents: prompt,
       config: {
         systemInstruction: "Você é um mestre de Jiu-Jitsu faixa preta 4º grau, sábio e muito técnico. Sua linguagem é didática, focada em mecânica corporal e estratégia. Responda em Português do Brasil.",
       }
     });
+    // Extract text directly from the property, not a method call.
     return response.text;
   } catch (error) {
     console.error("Gemini Error:", error);
