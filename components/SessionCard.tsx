@@ -1,5 +1,5 @@
-import React from 'react';
-import { Calendar, Clock, Target, Move, FileText, Trash2, Tag, Flame, Zap, Wind } from 'lucide-react';
+import React, { useState } from 'react';
+import { Calendar, Clock, Target, Move, FileText, Trash2, Tag, Flame, Zap, Wind, ChevronDown, ChevronUp, Users } from 'lucide-react';
 import { TrainingSession, SessionType } from '../types.ts';
 
 interface Props {
@@ -8,6 +8,8 @@ interface Props {
 }
 
 const SessionCard: React.FC<Props> = ({ session, onDelete }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const getIntensityConfig = (level: number) => {
     if (level <= 2) return {
       text: 'text-emerald-400',
@@ -51,7 +53,7 @@ const SessionCard: React.FC<Props> = ({ session, onDelete }) => {
   const formattedDate = new Date(session.date);
 
   return (
-    <div className="bg-zinc-900 border border-white/5 rounded-[2.5rem] shadow-xl overflow-hidden hover:border-blue-500/30 transition-all flex flex-col md:flex-row group">
+    <div className={`bg-zinc-900 border ${isExpanded ? 'border-blue-500/40' : 'border-white/5'} rounded-[2.5rem] shadow-xl overflow-hidden hover:border-blue-500/30 transition-all flex flex-col md:flex-row group`}>
       {/* Sidebar Date Display */}
       <div className="hidden md:flex flex-col items-center justify-center bg-zinc-950/80 border-r border-white/5 px-6 py-4 w-32 shrink-0">
         <span className="text-[11px] font-black text-slate-600 uppercase tracking-widest">
@@ -65,9 +67,9 @@ const SessionCard: React.FC<Props> = ({ session, onDelete }) => {
         </span>
       </div>
 
-      <div className="flex-1 p-6 md:p-8">
-        <div className="flex justify-between items-start mb-6">
-          <div className="flex flex-col gap-4">
+      <div className="flex-1 p-6 md:p-8 flex flex-col">
+        <div className="flex justify-between items-start">
+          <div className="flex flex-col gap-4 flex-1">
             <div className="flex items-center gap-3 flex-wrap">
               <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-sm ${getTypeBadgeColor(session.type)}`}>
                 {session.type}
@@ -112,62 +114,115 @@ const SessionCard: React.FC<Props> = ({ session, onDelete }) => {
             </div>
           </div>
 
-          <button 
-            onClick={() => onDelete(session.id)}
-            className="text-slate-700 hover:text-rose-500 transition-colors p-2 bg-zinc-950 rounded-2xl border border-white/5"
-            title="Excluir treino"
-          >
-            <Trash2 size={20} />
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-8">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-blue-500 font-black text-[11px] uppercase tracking-widest">
-              <Move size={16} strokeWidth={3} />
-              Técnicas
-            </div>
-            <div className="flex flex-wrap gap-2.5">
-              {session.positions && session.positions.length > 0 ? (
-                session.positions.map((pos, i) => (
-                  <span key={i} className="bg-zinc-950 text-slate-200 px-4 py-2 rounded-2xl text-xs font-bold border border-white/5 shadow-inner">
-                    {pos}
-                  </span>
-                ))
-              ) : (
-                <span className="text-slate-600 text-xs italic">Nenhuma posição registrada</span>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-emerald-500 font-black text-[11px] uppercase tracking-widest">
-              <Target size={16} strokeWidth={3} />
-              Drills
-            </div>
-            <div className="flex flex-wrap gap-2.5">
-              {session.drills && session.drills.length > 0 ? (
-                session.drills.map((drill, i) => (
-                  <span key={i} className="bg-zinc-950 text-slate-200 px-4 py-2 rounded-2xl text-xs font-bold border border-white/5 shadow-inner">
-                    {drill}
-                  </span>
-                ))
-              ) : (
-                <span className="text-slate-600 text-xs italic">Nenhum drill registrado</span>
-              )}
-            </div>
+          <div className="flex gap-2">
+            <button 
+              onClick={() => onDelete(session.id)}
+              className="text-slate-700 hover:text-rose-500 transition-colors p-2 bg-zinc-950 rounded-2xl border border-white/5"
+              title="Excluir treino"
+            >
+              <Trash2 size={20} />
+            </button>
+            <button 
+              onClick={() => setIsExpanded(!isExpanded)}
+              className={`p-2 rounded-2xl border transition-all ${isExpanded ? 'bg-blue-600 border-blue-500 text-white' : 'bg-zinc-950 border-white/5 text-slate-500 hover:text-blue-400'}`}
+              title={isExpanded ? "Recolher" : "Ver detalhes"}
+            >
+              {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+            </button>
           </div>
         </div>
 
-        {session.notes && (
-          <div className="mt-10 p-6 bg-zinc-950/50 rounded-[2rem] border border-white/5">
-            <div className="flex items-center gap-2 text-slate-500 font-black mb-4 text-[11px] uppercase tracking-widest">
-              <FileText size={16} strokeWidth={3} />
-              Anotações do Tatame
+        {/* Collapsed Preview Info */}
+        {!isExpanded && (
+          <div className="mt-4 flex gap-6 text-[10px] font-black uppercase tracking-widest text-slate-500">
+             <div className="flex items-center gap-2">
+                <Move size={12} className="text-blue-500" />
+                {session.positions?.length || 0} Técnicas
+             </div>
+             <div className="flex items-center gap-2">
+                <Target size={12} className="text-emerald-500" />
+                {session.drills?.length || 0} Drills
+             </div>
+          </div>
+        )}
+
+        {/* Expanded Content */}
+        {isExpanded && (
+          <div className="mt-10 animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-blue-500 font-black text-[11px] uppercase tracking-widest">
+                  <Move size={16} strokeWidth={3} />
+                  Técnicas Trabalhadas
+                </div>
+                <div className="flex flex-wrap gap-2.5">
+                  {session.positions && session.positions.length > 0 ? (
+                    session.positions.map((pos, i) => (
+                      <span key={i} className="bg-zinc-950 text-slate-200 px-4 py-2 rounded-2xl text-xs font-bold border border-white/5 shadow-inner">
+                        {pos}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-slate-600 text-xs italic">Nenhuma posição registrada</span>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-emerald-500 font-black text-[11px] uppercase tracking-widest">
+                  <Target size={16} strokeWidth={3} />
+                  Drills Realizados
+                </div>
+                <div className="flex flex-wrap gap-2.5">
+                  {session.drills && session.drills.length > 0 ? (
+                    session.drills.map((drill, i) => (
+                      <span key={i} className="bg-zinc-950 text-slate-200 px-4 py-2 rounded-2xl text-xs font-bold border border-white/5 shadow-inner">
+                        {drill}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-slate-600 text-xs italic">Nenhum drill registrado</span>
+                  )}
+                </div>
+              </div>
             </div>
-            <p className="text-sm text-slate-400 leading-relaxed font-medium italic">
-              "{session.notes}"
-            </p>
+
+            {session.partners && session.partners.length > 0 && (
+              <div className="mt-8 space-y-4">
+                <div className="flex items-center gap-2 text-indigo-400 font-black text-[11px] uppercase tracking-widest">
+                  <Users size={16} strokeWidth={3} />
+                  Parceiros de Treino
+                </div>
+                <div className="flex flex-wrap gap-2.5">
+                  {session.partners.map((partner, i) => (
+                    <span key={i} className="bg-zinc-950 text-slate-300 px-4 py-2 rounded-2xl text-xs font-bold border border-white/5 shadow-inner">
+                      {partner}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {session.notes && (
+              <div className="mt-10 p-6 bg-zinc-950/50 rounded-[2rem] border border-white/5">
+                <div className="flex items-center gap-2 text-slate-500 font-black mb-4 text-[11px] uppercase tracking-widest">
+                  <FileText size={16} strokeWidth={3} />
+                  Anotações Detalhadas
+                </div>
+                <p className="text-sm text-slate-400 leading-relaxed font-medium italic">
+                  "{session.notes}"
+                </p>
+              </div>
+            )}
+            
+            <div className="mt-8 pt-6 border-t border-white/5 flex justify-center">
+                <button 
+                  onClick={() => setIsExpanded(false)}
+                  className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 hover:text-blue-500 transition-colors flex items-center gap-2"
+                >
+                  Recolher detalhes <ChevronUp size={14} />
+                </button>
+            </div>
           </div>
         )}
       </div>
